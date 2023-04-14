@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.criown.mapper.ClientLogMapper">
+
+    <resultMap id="BaseResultMap" type="com.criown.entity.ClientLog">
+            <id property="userid" column="userid" jdbcType="INTEGER"/>
+            <result property="username" column="username" jdbcType="VARCHAR"/>
+            <result property="userpwd" column="userpwd" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        userid,username,userpwd
+    </sql>
+    <select id="selectUserpwdByUserid" resultType="String">
+        select userpwd
+        from client_log
+        where userid = #{userid}
+    </select>
+    <update id="updateUsernameAndUserpwdByUserid">
+        update client_log
+        set username = #{username},
+            userpwd  = #{userpwd}
+        where userid = #{userid}
+    </update>
+    <delete id="deleteByUserid">
+        delete
+        from client_log
+        where userid = #{userid}
+    </delete>
+    <insert id="insertAll">
+        insert into client_log
+            (userid, username, userpwd)
+        values (#{userid}, #{username}, #{userpwd})
+
+    </insert>
+    <select id="selectUseridByUsername" resultType="int">
+        select userid
+        from client_log
+        where username = #{username,jdbcType=VARCHAR}
+    </select>
+
+    <update id="updateUserpwdByUserid">
+        update client_log
+        set userpwd = #{userpwd,jdbcType=VARCHAR}
+        where userid = #{userid,jdbcType=NUMERIC}
+    </update>
+
+
+</mapper>

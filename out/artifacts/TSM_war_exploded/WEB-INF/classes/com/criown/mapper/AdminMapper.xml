@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.criown.mapper.AdminMapper">
+
+    <resultMap id="BaseResultMap" type="com.criown.entity.Admin">
+            <id property="userid" column="userid" jdbcType="INTEGER"/>
+            <result property="name" column="name" jdbcType="VARCHAR"/>
+            <result property="sex" column="sex" jdbcType="VARCHAR"/>
+            <result property="local" column="local" jdbcType="VARCHAR"/>
+            <result property="phone" column="phone" jdbcType="INTEGER"/>
+            <result property="detail" column="detail" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        userid,name,sex,
+        local,phone,detail
+    </sql>
+    <select id="selectAll" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from admin
+    </select>
+
+
+    <select id="getAllByQuery" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from admin
+        <where>
+            <if test="name != null and name != ''">
+                AND name like concat('%', #{name}, '%')
+            </if>
+            <if test="sex != null and sex != ''">
+                AND sex like concat('%', #{sex}, '%')
+            </if>
+            <if test="local != null and local != ''">
+                AND local like concat('%', #{local}, '%')
+            </if>
+
+        </where>
+    </select>
+    <update id="updateNameAndSexAndLocalAndPhoneAndDetailByUserid">
+        update admin
+        set name   = #{name,jdbcType=VARCHAR},
+            sex    = #{sex,jdbcType=VARCHAR},
+            local  = #{local,jdbcType=VARCHAR},
+            phone  = #{phone,jdbcType=NUMERIC},
+            detail = #{detail,jdbcType=VARCHAR}
+        where userid = #{userid,jdbcType=NUMERIC}
+    </update>
+
+</mapper>

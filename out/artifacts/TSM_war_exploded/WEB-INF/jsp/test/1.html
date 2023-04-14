@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Confirm Customer Order</title>
+    <link rel="stylesheet" href="path/to/layui.css">
+</head>
+<body>
+<div class="layui-container">
+    <div class="layui-row">
+        <div class="layui-col-md6">
+            <h1>Confirm Customer Order</h1>
+            <form class="layui-form" action="">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">Order Number</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="orderNumber" required lay-verify="required" placeholder="Enter order number" autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">Customer Name</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="customerName" required lay-verify="required" placeholder="Enter customer name" autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-input-block">
+                        <button class="layui-btn" lay-submit lay-filter="confirmOrder">Confirm Order</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script src="path/to/layui.js"></script>
+<script>
+    layui.use('form', function(){
+        var form = layui.form;
+        //监听提交
+        form.on('submit(confirmOrder)', function(data){
+            //TODO: Handle form submission
+            return false;
+        });
+    });
+</script>
+</body>
+</html>

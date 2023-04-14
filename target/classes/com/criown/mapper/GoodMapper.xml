@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.criown.mapper.GoodMapper">
+
+    <resultMap id="BaseResultMap" type="com.criown.entity.Good">
+            <id property="id" column="id" jdbcType="INTEGER"/>
+            <result property="clientid" column="clientid" jdbcType="INTEGER"/>
+            <result property="start" column="start" jdbcType="INTEGER" />
+            <result property="end" column="end" jdbcType="INTEGER"/>
+            <result property="sendtime" column="sendtime" jdbcType="TIMESTAMP"/>
+            <result property="recetime" column="recetime" jdbcType="TIMESTAMP"/>
+            <result property="detail" column="detail" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,clientid,start,
+        end,sendtime,recetime,
+        detail
+    </sql>
+
+    <select id="selectAll" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from good
+    </select>
+
+    <select id="selectAllById" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from good
+        where
+        id = #{id}
+    </select>
+
+    <delete id="delByList" parameterType="java.util.List">
+        delete
+        from good
+        where id in
+        <foreach collection="list" item="item" separator="," open="(" close=")" index="">
+            #{item}
+        </foreach>
+    </delete>
+
+    <update id="updateById">
+        update good
+        set clientid = #{clientid},start=#{start},end=#{end},sendtime=#{sendtime},recetime=#{recetime},detail=#{detail}
+        where id = #{id}
+    </update>
+
+    <insert id="addAll">
+        insert into good
+        (clientid, start,
+         end, sendtime, recetime,
+         detail)
+        values ( #{clientid}, #{start},
+                #{end}, #{sendtime}, #{recetime},
+                #{detail})
+
+    </insert>
+
+    <select id="searchAllByFrom" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from good
+        where
+        start = #{start}
+    </select>
+    <select id="searchAllByClientid" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from good
+        where
+        clientid = #{clientid,jdbcType=NUMERIC}
+    </select>
+    <select id="selectAllByIdAndClientid" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from good
+        where
+              clientid = #{clientid,jdbcType=NUMERIC}
+        <if test="id != null">
+            AND id=#{id}
+        </if>
+    </select>
+    <select id="searchAllByEnd" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from good
+        where
+        end = #{end,jdbcType=NUMERIC}
+    </select>
+    <update id="updateSendtimeAndRecetimeById">
+        update good
+        set sendtime = #{sendtime,jdbcType=TIMESTAMP},
+            recetime = #{recetime,jdbcType=TIMESTAMP}
+        where id = #{id,jdbcType=NUMERIC}
+    </update>
+    <select id="selectEndById" resultType="INTEGER">
+        select end
+        from good
+        where
+            id = #{id,jdbcType=NUMERIC}
+    </select>
+    <select id="selectStartById" resultType="INTEGER">
+        select start
+        from good
+        where id = #{id,jdbcType=NUMERIC}
+    </select>
+
+
+</mapper>
