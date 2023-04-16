@@ -129,3 +129,144 @@ DELIMITER ;
 333333：：5376b99396a3df93329f5a6f5322d7fa
 123456：：5985663f60fa37fd5476155c867d7676
 ```
+
+
+15. tets
+```js
+,
+                    {
+                        name: "line",
+                        type: 'lines',
+                        coordinateSystem: 'geo',
+                        polyline: true,
+                        data:{
+                            coords:[
+                                [118.802422, 32.064652], [120.31191, 31.491169]
+                            ]
+                        },
+                        lineStyle: {
+                            color: "#0e00fe",
+                            width: 0,
+                            type: 'solid'
+                        },
+                        effect: {
+                            constantSpeed: 20,
+                            show: true,
+                            trailLength: 0.1,
+                            symbolSize: 1.5
+                        }
+                    }
+```
+```js
+,
+                        markLine:{
+                            silent:false,
+                            label:{
+                                show:true,
+                                position:'middle',
+                                color: '#070707',
+                                fontStyle:'normal',
+                                data:{
+                                }
+                            },
+
+```
+```js
+,
+                    {
+                        type: 'lines',
+                        name: "line",
+                        coordinateSystem: 'geo',
+                        polyline: true,
+                        effect: {
+                            constantSpeed: 20,
+                            show: true,
+                            trailLength: 0.1,
+                            symbolSize: 1.5
+                        },
+                        lineStyle: {
+                            color: "#0e00fe",
+                            width: 0,
+                            type: 'solid'
+                        },
+                        data:{
+                            fromName: '南京', toName: '苏州', coords: [[118.8024, 32.0647], [120.31191, 31.491169]]
+                        }
+                    }
+```
+```js
+.map(function (item) {
+                            return {
+                                fromName: item.fromName,
+                                toName: item.toName,
+                                coords: [item.coords[0].concat(0), item.coords[1].concat(0)]
+                            };})
+```
+```js
+  {
+                        name: '江苏路径图',
+                        type: 'map',
+                        map: 'jiangsu',
+                        label: {
+                            show: true
+                        },
+                        roam: true,
+                        data: [
+                        ],
+                        markPoint: {
+                            symbol: "circle",
+                            symbolSize: 10,
+                            label: {
+                                show: false,
+                                formatter: '{b}'
+                            },
+                            itemStyle: {
+                                color: '#F00'
+                            },
+                            data: [
+                                {name: '南京市', coord: [118.802422, 32.064652]},
+                                {name: '无锡市', coord: [120.31191, 31.491169]},
+                                {name: '徐州市', coord: [117.284124, 34.205768]},
+                                {name: '常州市', coord: [119.973987, 31.810689]},
+                                {name: '苏州市', coord: [120.585315, 31.298886]},
+                                {name: '南通市', coord: [120.856394, 32.016212]},
+                                {name: '连云港市', coord: [119.22295, 34.59669]},
+                                {name: '淮安市', coord: [119.021265, 33.597506]},
+                                {name: '盐城市', coord: [120.163562, 33.347383]},
+                                {name: '扬州市', coord: [119.412966, 32.39421]},
+                                {name: '镇江市', coord: [119.425836, 32.187849]},
+                                {name: '泰州市', coord: [119.915176, 32.484882]},
+                                {name: '宿迁市', coord: [118.275162, 33.963008]}
+                            ]
+                        },
+                        },
+
+```
+```js
+  markPoint: {
+                            symbol: "circle",
+                            symbolSize: 10,
+                            label: {
+                                show: false,
+                                formatter: '{b}'
+                            },
+                            itemStyle: {
+                                color: '#F00'
+                            },
+                            data: [
+                                {name: '南京市', coord: [118.802422, 32.064652]},
+                                {name: '无锡市', coord: [120.31191, 31.491169]},
+                                {name: '徐州市', coord: [117.284124, 34.205768]},
+                                {name: '常州市', coord: [119.973987, 31.810689]},
+                                {name: '苏州市', coord: [120.585315, 31.298886]},
+                                {name: '南通市', coord: [120.856394, 32.016212]},
+                                {name: '连云港市', coord: [119.22295, 34.59669]},
+                                {name: '淮安市', coord: [119.021265, 33.597506]},
+                                {name: '盐城市', coord: [120.163562, 33.347383]},
+                                {name: '扬州市', coord: [119.412966, 32.39421]},
+                                {name: '镇江市', coord: [119.425836, 32.187849]},
+                                {name: '泰州市', coord: [119.915176, 32.484882]},
+                                {name: '宿迁市', coord: [118.275162, 33.963008]}
+                            ]
+                        },
+```
