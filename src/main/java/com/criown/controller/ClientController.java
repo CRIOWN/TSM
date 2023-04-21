@@ -2,6 +2,7 @@ package com.criown.controller;
 
 import com.criown.entity.Good;
 import com.criown.entity.Goodshow;
+import com.criown.entity.Node;
 import com.criown.service.ClientService;
 import com.criown.service.GoodService;
 import com.criown.utils.DateUtil;
@@ -40,7 +41,7 @@ public class ClientController {
     //跳转首页
     @RequestMapping("/gotoMain1")
     public String gotoMain1(){
-        return "TM/listForGood";
+        return "client/listForGood";
     }
 
     //跳转新增订单
@@ -53,7 +54,8 @@ public class ClientController {
     //Good.json
     @PostMapping("/listForGood")
     @ResponseBody
-    public Map<String,Object> GoodJsonData(@RequestBody(required = false)  Map<String,Object> map, HttpServletRequest request){
+    public Map<String,Object> GoodJsonData(@RequestBody(required = false)  Map<String,Object> map, HttpServletRequest request)
+    {
         System.out.println("GoodJsonData::"+map+"END");
         //clientLogInfo
         HttpSession session=request.getSession();
@@ -83,7 +85,8 @@ public class ClientController {
     //Good增加
     @PostMapping("/AddGood")
     @ResponseBody
-    public Map<String,Object> AddGood(@RequestBody(required = false)  Map<String,Object> map,HttpServletRequest request) throws IOException {
+    public Map<String,Object> AddGood(@RequestBody(required = false)  Map<String,Object> map,HttpServletRequest request) throws IOException
+    {
         System.out.println("ClientAddGood::"+map);
         HttpSession session= request.getSession();
         Integer clientid= (Integer) session.getAttribute("clientLogInfo");
@@ -92,13 +95,6 @@ public class ClientController {
         String detail=String.valueOf(map.get("detail"));
         Date sendtime=new Date();
 
-//        int n=0;
-//        n= TxTsp.tsp(start,end);  //Tsp 计算路径长
-//        int hour=n/(5000/24); //计算时长
-//        System.out.println(hour);
-//
-        //计算
-//        Date recetime= DateUtil.calculate(sendtime,hour);
         Date recetime=null;
         System.out.println("clientid="+clientid+"::start="+start+"::end="+end+"::detail="+detail+"::sendtime="+sendtime+"::recetime"+recetime);
         goodService.addAll(clientid,start,end,sendtime,recetime,detail);
@@ -108,7 +104,8 @@ public class ClientController {
     //客户删除
     @PostMapping("/DelGood")
     @ResponseBody
-    public Map<String,Object> DelGood(@RequestBody List<String> ids){
+    public Map<String,Object> DelGood(@RequestBody List<String> ids)
+    {
         System.out.println("DelGood::"+ids);
         List<Integer> list=new ArrayList<>();
         for(String s:ids){
@@ -122,7 +119,8 @@ public class ClientController {
 
     //跳转Good编辑
     @RequestMapping("/gotoEditGood")
-    public String gotoEditGood(Integer id,HttpServletRequest request, Model model){
+    public String gotoEditGood(Integer id,HttpServletRequest request, Model model)
+    {
         System.out.println("gotoEditGood::"+id);
         Integer clientid = (Integer) request.getSession().getAttribute("clientLogInfo");
         model.addAttribute("clientid",clientid);
@@ -133,7 +131,8 @@ public class ClientController {
     //Good编辑
     @PostMapping("/EditGood")
     @ResponseBody
-    public Map<String,Object> GoodEdit(@RequestBody Map<String,Object> map) throws IOException {
+    public Map<String,Object> GoodEdit(@RequestBody Map<String,Object> map) throws IOException
+    {
         System.out.println("GoodEdit::"+map);
         int id=Integer.parseInt(String.valueOf(map.get("id")));
         int clientid=Integer.parseInt(String.valueOf(map.get("clientid")));
@@ -159,7 +158,8 @@ public class ClientController {
     //资料修改
     @RequestMapping("/changeUser")
     @ResponseBody
-    public Map changeUser(@RequestBody Map<String,Object> map, HttpServletRequest request) {
+    public Map changeUser(@RequestBody Map<String,Object> map, HttpServletRequest request)
+    {
         System.out.println("ChangePassword::" + map);
         HttpSession session = request.getSession();
         Integer id = (Integer) session.getAttribute("adminLogInfo");
@@ -175,24 +175,32 @@ public class ClientController {
 
     //跳转QS
     @RequestMapping("/gotoQS")
-    public String gotoQS(){
-        return "client/QS";
+    public String gotoQS(Integer id,HttpServletRequest request,Model model){
+        Integer clientid = (Integer) request.getSession().getAttribute("clientLogInfo");
+        System.out.println("QSDeal::id=" +id+"::clientid="+clientid );
+        model.addAttribute("id",id);
+        model.addAttribute("clientid",clientid);
+        return "test/echarts";
     }
 
     //QS
     @RequestMapping("/QSDeal")
     @ResponseBody
-    public Map QSDeal(@RequestBody Map<String,Object> map, HttpServletRequest request) {
-        System.out.println("QSDeal::" + map);
-        HttpSession session = request.getSession();
-        Integer id = (Integer) session.getAttribute("adminLogInfo");
-        String name = (String) map.get("username");
-        String sex = (String) map.get("sex");
-        String local = (String) map.get("local");
-        Integer phone = Integer.valueOf((String) map.get("phone"));
-        String detail = (String) map.get("detail");
-        clientService.updateAllById(name, sex, local, detail, phone, id);
-        return MapControl.getInstance().error("修改成功").getMap();
+    public Map QSDeal(@RequestBody Map<String,Object> map,Model model) throws IOException {
+        System.out.println("QSdeal::"+map);
+        Integer id = Integer.valueOf((String) map.get("id"));
+        Integer clientid = Integer.valueOf((String) map.get("clientid"));
+        System.out.println("QSDeal::id=" +id+"::clientid="+clientid );
+        int start=goodService.selectStartById(id);
+        int end=goodService.selectEndById(id);
+        List<Node> path=TxTsp.tsp_path(start,end);
+        int pathWeight= TxTsp.getValue(path);
+        System.out.println("pathWeight::"+pathWeight);
+        model.addAttribute("pathWeight",pathWeight);
+        List<Integer> list=new ArrayList<>();
+        for(int i=0;i<path.size();i++) list.add(path.get(i).id);
+        System.out.println("list::"+list);
+        return MapControl.getInstance().jsonSuccess(list,1).getMap();
     }
 
 }

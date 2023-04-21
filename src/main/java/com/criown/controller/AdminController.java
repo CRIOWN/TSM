@@ -446,6 +446,9 @@ public class AdminController {
     @ResponseBody
     public Map<String,Object> function() throws IOException {
         System.out.println("function::");
+        
+
+
         return MapControl.getInstance().jsonSuccess().getMap();
     }
 

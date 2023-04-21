@@ -6,6 +6,10 @@
   To change this template use File | Settings | File Templates.
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%
+    Integer id = (Integer) request.getAttribute("id");
+    Integer clientid = (Integer) request.getAttribute("clientid");
+%>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -40,69 +44,160 @@
         <div id="Emap" style="background-color:#ffffff;min-height:400px;padding: 10px"></div>
     </div>
 </div>
+<div class="layui-row layui-col-space15">
+    <div id="temp">路径为：</div>
+</div>
 
 
-
+<script src="../../static/echarts/echarts.js" charset="utf-8"></script>
 <%--<script src="https://cdn.jsdelivr.net/npm/echarts@5.4.1/dist/echarts.min.js "></script>--%>
 <script src="../../static/lib/layui-v2.6.3/layui.js" charset="utf-8"></script>
 <%--<script src="//api.map.baidu.com/api?v=1.0&type=webgl&ak=pl2seBoP0MbDQuMUlogePygiCPAhKl5c"></script>--%>
 <script src="../../static/js/lay-config.js?v=1.0.4" charset="utf-8"></script>
-<script src="../../static/echarts/echarts.js" charset="utf-8"></script>
+<script src="../../static/js/cityMapper.js" charset="utf-8"></script>
 <script>
     layui.use(['layer','jquery'], function ()
     {
-        var $ = layui.jquery;
-
-        //基础绘制
+       var id = '<%= id %>';
+       var clientid = '<%= clientid %>';
+       const myData ={
+           "id":id,
+           "clientid":clientid
+       }
+       var $ = layui.jquery;
+       var pathnode=[];
+       var lineData=[];
         var Emap = echarts.init(document.getElementById('Emap'), 'walden');
         Emap.showLoading();
+        const Element =document.getElementById("temp")
+        $.ajax({
+            url:"QSDeal",
+            type:"post",
+            data:JSON.stringify(myData),
+            dataType:"json",
+            contentType:'application/json',
+            success:function (data){
+                pathnode.push(...data.data)
+                console.log(pathnode)
+                for(let i=0;i<pathnode.length-1;i++)
+                {
+                    let from= convertIdToCityName(pathnode[i])
+                    let to = convertIdToCityName(pathnode[i+1])
+                    let frompoint=convertIdToCityLocal(pathnode[i]);
+                    let topoint=convertIdToCityLocal(pathnode[i+1]);
+                    lineData.push({
+                        point:[from,to],
+                        coords: [frompoint,topoint]
+                    })
+                    Element.innerHTML += (from+"==>")
+                    if(i==pathnode.length-2)  Element.innerHTML += to
+                }
 
-        $.get('https://geo.datav.aliyun.com/areas_v3/bound/320000_full.json', function (geoJson) {
-            //console.log("test1");
-            echarts.registerMap('jiangsu', geoJson);
-            Emap.setOption(
-                (option = {
-                    title: {
-                        text: '物流路径',
-                        subtext: '江苏省',
-                    },
-                    tooltip: {
-                        trigger: 'item',
-                        formatter: '地名'
-                    },
-                    toolbox: {
-                        show: true,
-                        orient: 'vertical',
-                        left: 'right',
-                        top: 'center',
-                        feature: {
-                            dataView: {readOnly: false},
-                            restore: {},
-                            saveAsImage: {}
-                        }
-                    },
-                    series: [
-                        {
-                            name: '江苏路径图',
-                            type: 'map',
+                //console.log("lineData"+lineData)
+                // lineData.push({
+                //     point:['南京市','苏州市'],
+                //     coords: [[118.802422, 32.064652],[120.585315, 31.298886]]
+                // })
+
+                //基础绘制
+                var option;
+                $.get('https://geo.datav.aliyun.com/areas_v3/bound/320000_full.json', function (geoJson) {
+                    echarts.registerMap('jiangsu', geoJson);
+                    option = {
+                        title: {
+                            text: '物流路径',
+                            subtext: '江苏省',
+                        },
+                        tooltip: {
+                            trigger: 'item',
+                            formatter: '地名'
+                        },
+                        toolbox: {
+                            show: true,
+                            orient: 'vertical',
+                            left: 'right',
+                            top: 'center',
+                            feature: {
+                                dataView: {readOnly: false},
+                                restore: {},
+                                saveAsImage: {}
+                            }
+                        },
+                        geo: {
+                            show: false,
                             map: 'jiangsu',
-                            label: {
-                                show: true
-                            },
+                            type: 'map',
                             roam: true,
-                            data: [
-                                //赋值
-                                // { name: '中西区', value: 20057.34 },
-                            ],
-                            markPoint: {
-                                symbol: "circle",
-                                symbolSize: 10,
-                                label: {
+                            label: {
+                                normal: {
+                                    // 显示省份标签
                                     show: false,
-                                    formatter: '{b}'
+                                    textStyle: {
+                                        color: '#fff',
+                                        fontSize: 10
+                                    }
                                 },
-                                itemStyle: {
-                                    color: '#F00'
+                                emphasis: {
+                                    // 对应的鼠标悬浮效果
+                                    show: true,
+                                    // 选中后的字体样式
+                                    textStyle: {
+                                        color: '#000',
+                                        fontSize: 14
+                                    }
+                                }
+                            }
+                        },
+                        series: [
+                            {
+                                name: '江苏路径图',
+                                type: 'map',
+                                map: 'jiangsu',
+                                label: {
+                                    show: true
+                                },
+                                roam: false,
+                                data: [
+                                ],
+                                markPoint: {
+                                    symbol: "circle",
+                                    symbolSize: 10,
+                                    label: {
+                                        show: false,
+                                        formatter: '{b}'
+                                    },
+                                    itemStyle: {
+                                        color: '#F00'
+                                    },
+                                    data: [
+                                        {name: '南京市', coord: [118.802422, 32.064652]},
+                                        {name: '无锡市', coord: [120.31191, 31.491169]},
+                                        {name: '徐州市', coord: [117.284124, 34.205768]},
+                                        {name: '常州市', coord: [119.973987, 31.810689]},
+                                        {name: '苏州市', coord: [120.585315, 31.298886]},
+                                        {name: '南通市', coord: [120.856394, 32.016212]},
+                                        {name:'连云港市',coord: [119.22295, 34.59669]},
+                                        {name: '淮安市', coord: [119.021265, 33.597506]},
+                                        {name: '盐城市', coord: [120.163562, 33.347383]},
+                                        {name: '扬州市', coord: [119.412966, 32.39421]},
+                                        {name: '镇江市', coord: [119.425836, 32.187849]},
+                                        {name: '泰州市', coord: [119.915176, 32.484882]},
+                                        {name: '宿迁市', coord: [118.275162, 33.963008]}
+                                    ]
+                                },
+                            },
+                            {
+                                name: '',
+                                type: 'scatter',
+                                coordinateSystem: 'geo',
+                                color: ['#000'],
+                                tooltip: {
+                                    position: "right",
+                                    color: "#000",
+                                    formatter(d) {
+                                        console.log(d)
+                                        return `<div style="padding: 5px 10px;">【${d.data.name}】</div>`;
+                                    },
                                 },
                                 data: [
                                     {name: '南京市', coord: [118.802422, 32.064652]},
@@ -118,43 +213,51 @@
                                     {name: '镇江市', coord: [119.425836, 32.187849]},
                                     {name: '泰州市', coord: [119.915176, 32.484882]},
                                     {name: '宿迁市', coord: [118.275162, 33.963008]}
-                                ]
+                                ],
                             },
-                            lines: {
-                                data: [[118.796877, 32.060255], [120.585315, 31.298886], [120.305456, 31.570037],
-                                    [119.981861, 31.771397]],
+                            {
+                                type: 'lines',
+                                coordinateSystem: 'geo',
+                                effect: {
+                                    constantSpeed: 20,
+                                    show: true,
+                                    trailLength: 0.1,
+                                    symbolSize: 1.5
+                                },
                                 lineStyle: {
-                                    color: "#0e00fe",
-                                    width: 4,
-                                    type: 'solid'
-                                }
-                            }
-                        },
-                        {
-                            type: 'lines',
-                            coordinateSystem: 'geo',
-                            polyline: true,
-                            data: [[118.796877, 32.060255], [120.585315, 31.298886], [120.305456, 31.570037],
-                                [119.981861, 31.771397]],
-                            lineStyle: {
-                                color: "#0e00fe",
-                                width: 0,
-                                type: 'solid'
-                            },
-                            effect: {
-                                constantSpeed: 20,
+                                    type: 'solid',
+                                    width: 3,
+                                    opacity: 1,
+                                    curveness: 0,
+                                    orient: 'horizontal',
+                                    color: "#f80e0e",
+                                },
+                                tooltip: {
+                                    position: "right",
+                                    color: "#000",
+                                    formatter(d) {
+                                        //console.log(d.data.point[0]);
+                                       // console.log(d.data.point[1]);
+                                        return '<div style="padding: 5px 10px;"> 【' + d.data.point[0] + '】< ---- >【' + d.data.point[1] + '】</div>';;
+                                    },
+                                },
                                 show: true,
-                                trailLength: 0.1,
-                                symbolSize: 1.5
-                            },
-                            zlevel: 1
-                        }
-                    ]
-                })
-            );
-            //  console.log("test2");
-            Emap.hideLoading();
-        });
+                                data: lineData,
+                                zlevel:3
+
+                            }
+                        ]
+                    };
+                    Emap.setOption(option);
+                    //console.log("do get"+option);
+                    Emap.hideLoading();
+                });
+
+            }
+
+        })
+
+
     });
 </script>
 

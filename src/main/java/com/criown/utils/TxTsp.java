@@ -198,7 +198,7 @@ public class TxTsp{
     }
 
     //得到路径值
-    public int getValue(List<Node> path){
+    public static int getValue(List<Node> path){
         int pathWeight=0;
         for(int n=0;n<path.size()-1;n++)
         {
@@ -220,13 +220,28 @@ public class TxTsp{
         Node[] nodes= ts.buildGraph(ts.distance);
         Dijkstra.dijkstra(nodes[from]);
         List<Node> path = new ArrayList<>();
-        path=Dijkstra.getPath(nodes[to]);
-        //找对应线
+        path=Dijkstra.getPath(nodes[to]);//找对应线
+
         int pathWeight= ts.getValue(path);
         System.out.println("pathWeight::"+pathWeight);
         return pathWeight;
 
     }
+
+    public static List<Node> tsp_path(int from ,int to) throws IOException {
+        TxTsp ts = new TxTsp(13);//城市数
+        ts.init("/jiangsu.txt");
+        ts.solve();
+        //ts.showinit();
+        ts.redo(ts.tspPath);
+        Node[] nodes= ts.buildGraph(ts.distance);
+        Dijkstra.dijkstra(nodes[from]);
+        List<Node> path = new ArrayList<>();
+        path=Dijkstra.getPath(nodes[to]);//找对应线
+        return path;
+
+    }
+
 
     //6_>8
     public static void main() throws IOException {
