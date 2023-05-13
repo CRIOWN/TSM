@@ -67,6 +67,7 @@ public class AdminLogController {
             {
                 System.out.println("验证失败");
                 return MapControl.getInstance().error("密码错误,请重试").getMap();
+
             }
         }
         catch (NullPointerException e){
@@ -122,7 +123,9 @@ public class AdminLogController {
     public Map ChangePassword(@RequestBody Map<String,Object> map, HttpServletRequest request){
         System.out.println("ChangePassword::"+map);
         String oldPwd = (String) map.get("oldPwd");
+        oldPwd = MD5.getMD5(oldPwd);
         String pwd = (String) map.get("pwd");
+        pwd = MD5.getMD5(pwd);
         HttpSession session=request.getSession();
         Integer id= (Integer) session.getAttribute("adminLogInfo");
         String temp= adminLogService.selectUserpwdByUserid(id);

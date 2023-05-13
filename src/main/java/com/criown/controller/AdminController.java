@@ -7,6 +7,7 @@ import com.criown.entity.Staff;
 import com.criown.service.*;
 import com.criown.utils.DateUtil;
 import com.criown.utils.MapControl;
+import com.criown.utils.Redisutils;
 import com.criown.utils.TxTsp;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -436,22 +437,36 @@ public class AdminController {
     //跳转功能
     @RequestMapping("/gotoFunction")
     public String gotoFunction(){
-        return "test/echarts";
+        return "TM/function";
     }
 
 
     //
-    //Good编辑
-    @PostMapping("/function")
+    //保存TSP
+    @PostMapping("/function1")
     @ResponseBody
-    public Map<String,Object> function() throws IOException {
-        System.out.println("function::");
-        
-
+    public Map<String,Object> function1() throws IOException {
+        System.out.println("function:1:");
+        int flag=0;
+        Redisutils redisutils = new Redisutils();
+        flag = redisutils.judge();
+        if( flag==1 ) System.out.println("成功");
+        else redisutils.choose(true);
+        return MapControl.getInstance().jsonSuccess().getMap();
+    }
+    //删除Tsp
+    @PostMapping("/function2")
+    @ResponseBody
+    public Map<String,Object> function2() throws IOException {
+        System.out.println("function:2:");
+        int flag=0;
+        Redisutils redisutils = new Redisutils();
+        flag = redisutils.judge();
+        if( flag==0 ) System.out.println("成功");
+        else redisutils.choose(false);
 
         return MapControl.getInstance().jsonSuccess().getMap();
     }
-
     //==========QS=====================
     //Good.json
     @PostMapping("/listForQS")

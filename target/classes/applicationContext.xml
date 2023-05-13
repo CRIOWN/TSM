@@ -7,33 +7,7 @@
     <import resource="classpath:spring-service.xml"/>
     <import resource="classpath:spring-mvc.xml"/>
 
-    <bean id="jedisPoolConfig" class="redis.clients.jedis.JedisPoolConfig">
-        <property name="maxTotal" value="500"/>
-        <property name="maxIdle" value="100"/>
-        <property name="maxWaitMillis" value="10000"/>
-    </bean>
 
-    <bean id="jedisPool" class="redis.clients.jedis.JedisPool">
-        <constructor-arg ref="jedisPoolConfig"/>
-        <constructor-arg value="127.0.0.1"/>
-        <constructor-arg value="6379"/>
-    </bean>
-    <bean id="redisTemplate" class="org.springframework.data.redis.core.RedisTemplate">
-        <property name="connectionFactory" ref="jedisConnectionFactory"/>
-        <property name="keySerializer">
-            <bean class="org.springframework.data.redis.serializer.StringRedisSerializer"/>
-        </property>
-        <property name="valueSerializer">
-            <bean class="org.springframework.data.redis.serializer.StringRedisSerializer"/>
-        </property>
-    </bean>
-
-    <bean id="jedisConnectionFactory" class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory">
-        <property name="poolConfig" ref="jedisPoolConfig"/>
-        <property name="hostName" value="127.0.0.1"/>
-        <property name="port" value="6379"/>
-        <property name="usePool" value="true"/>
-    </bean>
 
 
 </beans>

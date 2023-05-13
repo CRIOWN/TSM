@@ -5,9 +5,9 @@
 
 <configuration>
 <!--日志-->
-<!--    <settings>-->
-<!--        <setting name="logImpl" value="STDOUT_LOGGING"/>-->
-<!--    </settings>-->
+    <settings>
+        <setting name="logImpl" value="STDOUT_LOGGING"/>
+    </settings>
 
 
     <typeAliases>
@@ -24,16 +24,9 @@
     <!--            </dataSource>-->
     <!--        </environment>-->
     <!--    </environments>-->
-<!--    <typeHandlers>-->
-<!--        <typeHandler handler="com.example.CityTypeHandler" javaType="com.criown.utils.CityEnum"/>-->
-<!--    </typeHandlers>-->
-
 
 
     <mappers>
-        <!--mapper/AdminLogMapper.xml
-        com/criown/mapper/AdminLogMapper.xml
-           <mapper resource="com/criown/mapper/UserMapper.xml"/>-->
         <mapper resource="com/criown/mapper/AdminLogMapper.xml"/>
         <mapper resource="com/criown/mapper/ClientLogMapper.xml"/>
         <mapper resource="com/criown/mapper/StaffLogMapper.xml"/>

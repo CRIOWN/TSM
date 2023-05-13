@@ -13,6 +13,7 @@ Ajax-post请求无法返回视图
 5 sql删除后自增不连续
 因为默认数据库引擎innodb是通过一个变量递加来实现id自增
 重启数据库可以重置 让数据连续 
+
 6.导入依赖后仍显示
 java.lang.ClassNotFoundException: com.google.common.base.Splitter
 java.lang.NoClassDefFoundError: com/google/common/base/Splitter
@@ -20,7 +21,22 @@ java.lang.NoClassDefFoundError: com/google/common/base/Splitter
 
 6. layui参数
    contentType ：发送到服务端的内容编码类型。如果你要发送 json 内容，可以设置：contentType: 'application/json'
+   Java中的List是一种有序的集合，可以存储重复元素，常用的函数包括：
 
+   add(E e)：向列表末尾添加元素e；
+   add(int index, E element)：在指定索引位置插入元素element；
+   remove(int index)：删除指定索引位置的元素；
+   remove(Object o)：删除指定元素o；
+   clear()：清空列表中所有元素；
+   size()：返回列表中元素的数量；
+   get(int index)：返回指定索引位置的元素；
+   set(int index, E element)：将指定索引位置的元素替换为element；
+   contains(Object o)：判断列表是否包含指定元素o；
+   indexOf(Object o)：返回指定元素o在列表中第一次出现的索引位置；
+   lastIndexOf(Object o)：返回指定元素o在列表中最后一次出现的索引位置；
+   subList(int fromIndex, int toIndex)：返回列表中从fromIndex（包含）到toIndex（不包含）之间的子列表。
+
+除此之外，还可以使用迭代器（Iterator）对列表中的元素进行遍历和访问。
 
 7. 删除触发器
 ```sql

@@ -111,11 +111,6 @@
                 layer.msg('密码不能为空');
                 return false;
             }
-            if (data.captcha == '') {
-                layer.msg('验证码不能为空');
-                return false;
-            }
-
             if (data.kind == '') {
                 layer.msg('验证码不能为空');
                 return false;

@@ -17,7 +17,7 @@ public class TxTsp{
     public int[] walked;//表示是否走过，走过置0
     public int[] choosed;//代表选过置0
     public List tspPath =new ArrayList<>();
-
+    public Redisutils redisutils =new Redisutils();
     public TxTsp(int n) {
         cityNum = n;
     }
@@ -119,37 +119,48 @@ public class TxTsp{
 
     //算最优路径
     public void solve(){
-        int[] temp = new int[cityNum];
-        String path="0";
-        tspPath.add(0);
-        int s=0;//计算距离
-        int i=0;//当前节点
-        int j=0;//下一个节点
-        //默认从0开始
-//        选过置0 未置1
-        while(choosed[i]==1)
+        tspPath=new ArrayList<>();
+        if(redisutils.judge()==1)
         {
-            //复制一行
-            for (int k = 0; k < cityNum; k++) {
-                temp[k] = distance[i][k];
-                //System.out.print(temp[k]+" ");
-            }
-
-            //选择下一个节点，要求：不是已经走过，并且与i不同
-            j = selectmin(temp);
-            //找出下一节点
-            choosed[i] = 0;//行置0，表示已经选过
-            walked[j] = 0;//列0，表示已经走过
-            tspPath.add(j);
-            path+="-->" + j;
-            //System.out.println(i + "-->" + j);
-           // System.out.println(distance[i][j]);
-            s = s + distance[i][j];
-            i = j;//当前节点指向下一跳节点
+            System.out.println("已存在redis中");
+            tspPath=redisutils.getPath();
         }
-        System.out.println();
-        System.out.println("路径:" + path);
-        System.out.println("总距离为:" + s);
+        else
+        {
+            System.out.println("计算redis");
+            int[] temp = new int[cityNum];
+            String path="0";
+            tspPath.add(0);
+            int s=0;//计算距离
+            int i=0;//当前节点
+            int j=0;//下一个节点
+            //默认从0开始
+//          选过置0 未置1
+            while(choosed[i]==1)
+            {
+                //复制一行
+                for (int k = 0; k < cityNum; k++) {
+                    temp[k] = distance[i][k];
+                    //System.out.print(temp[k]+" ");
+                }
+                //选择下一个节点，要求：不是已经走过，并且与i不同
+                j = selectmin(temp);
+                //找出下一节点
+                choosed[i] = 0;//行置0，表示已经选过
+                walked[j] = 0;//列0，表示已经走过
+                tspPath.add(j);
+                path+="-->" + j;
+                //System.out.println(i + "-->" + j);
+                // System.out.println(distance[i][j]);
+                s = s + distance[i][j];
+                i = j;//当前节点指向下一跳节点
+            }
+            System.out.println();
+            System.out.println("路径:" + path);
+            System.out.println("总距离为:" + s);
+            redisutils.setPath(tspPath);
+            redisutils.choose(true);
+        }
         System.out.println("Path::"+tspPath);
         System.out.println("========================");
     }
@@ -211,12 +222,20 @@ public class TxTsp{
         return  pathWeight;
     }
 
-    public static int tsp(int from ,int to) throws IOException {
+    //计算初始化
+    public static TxTsp initTsp() throws IOException {
         TxTsp ts = new TxTsp(13);//城市数
         ts.init("/jiangsu.txt");
         ts.solve();
         //ts.showinit();
         ts.redo(ts.tspPath);
+        return ts;
+    }
+
+    //路径值
+    public static int tsp(int from ,int to) throws IOException {
+        TxTsp ts=initTsp();
+
         Node[] nodes= ts.buildGraph(ts.distance);
         Dijkstra.dijkstra(nodes[from]);
         List<Node> path = new ArrayList<>();
@@ -225,15 +244,11 @@ public class TxTsp{
         int pathWeight= ts.getValue(path);
         System.out.println("pathWeight::"+pathWeight);
         return pathWeight;
-
     }
 
+    //快递路线
     public static List<Node> tsp_path(int from ,int to) throws IOException {
-        TxTsp ts = new TxTsp(13);//城市数
-        ts.init("/jiangsu.txt");
-        ts.solve();
-        //ts.showinit();
-        ts.redo(ts.tspPath);
+        TxTsp ts=initTsp();
         Node[] nodes= ts.buildGraph(ts.distance);
         Dijkstra.dijkstra(nodes[from]);
         List<Node> path = new ArrayList<>();

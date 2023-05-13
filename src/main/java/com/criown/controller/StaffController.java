@@ -247,11 +247,6 @@ public Map<String,Object> Main1Data1(){
     @ResponseBody
     public Map<String,Object> QSDeal(@RequestBody Integer id) throws IOException {
         System.out.println("QSDeal::"+id);
-//        List<Integer> list=new ArrayList<>();
-//        for(String s:ids){
-//            list.add(Integer.parseInt(s));
-//        }
-//        System.out.println("list::"+list);
         int start=goodService.selectStartById(id);
         int end =goodService.selectEndById(id);
         Date sendtime=new Date();

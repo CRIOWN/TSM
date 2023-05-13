@@ -15,8 +15,11 @@
 <body>
 <div class="layui-form-item">
     <div class="layui-input-block">
-        <button class="layui-btn layui-btn-normal" lay-submit lay-filter="saveBtn">确认保存</button>
+        <button class="layui-btn layui-btn-normal" lay-submit lay-filter="saveBtn">保存</button>
+        <button class="layui-btn layui-btn-normal" lay-submit lay-filter="delBtn">删除</button>
     </div>
+
+
 </div>
 <script src="../../static/lib/layui-v2.6.3/layui.js" charset="utf-8"></script>
 <script>
@@ -28,7 +31,27 @@
         //监听提交
         form.on('submit(saveBtn)', function (data) {
             $.ajax({
-                url: "function",
+                url: "function1",
+                type: "POST",
+                contentType: "application/json",
+                dataType: "json",
+                data: JSON.stringify(data.field),
+                success: function (data) {
+                    if (data.code == 0) {
+                        layer.msg("修改成功::" + data.msg);
+
+                    } else {
+                        layer.msg("修改失败::" + data.msg);
+                    }
+                    var iframeIndex = parent.layer.getFrameIndex(window.name);
+                    parent.layer.close(iframeIndex);
+                }
+            });
+            return false;
+        });
+        form.on('submit(saveBtn)', function (data) {
+            $.ajax({
+                url: "function2",
                 type: "POST",
                 contentType: "application/json",
                 dataType: "json",

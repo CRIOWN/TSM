@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import redis.clients.jedis.Jedis;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -94,7 +95,6 @@ public class ClientController {
         Integer end=Integer.valueOf(String.valueOf(map.get("end")));
         String detail=String.valueOf(map.get("detail"));
         Date sendtime=new Date();
-
         Date recetime=null;
         System.out.println("clientid="+clientid+"::start="+start+"::end="+end+"::detail="+detail+"::sendtime="+sendtime+"::recetime"+recetime);
         goodService.addAll(clientid,start,end,sendtime,recetime,detail);
@@ -200,6 +200,23 @@ public class ClientController {
         List<Integer> list=new ArrayList<>();
         for(int i=0;i<path.size();i++) list.add(path.get(i).id);
         System.out.println("list::"+list);
+//        Jedis jedis =new Jedis("localhost");
+//        System.out.println("redis 存储的字符串为: "+ jedis.get("runoobkey"));
+        return MapControl.getInstance().jsonSuccess(list,1).getMap();
+    }
+
+    @RequestMapping("/gettime")
+    @ResponseBody
+    public Map gettime(@RequestBody Map<String,Object> map,Model model) throws IOException
+    {
+        Integer id = Integer.valueOf((String) map.get("id"));
+        System.out.println("gettime::"+id);
+        List<String> list = new ArrayList<>();
+
+        Good good= goodService.selectAllById(id).get(0);
+        String s=DateUtil.formatDate2(good.getRecetime());
+        list.add(s);
+        list.add(DateUtil.getTime());
         return MapControl.getInstance().jsonSuccess(list,1).getMap();
     }
 

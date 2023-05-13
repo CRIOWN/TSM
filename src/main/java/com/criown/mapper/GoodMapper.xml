@@ -84,6 +84,7 @@
             AND id=#{id}
         </if>
     </select>
+
     <select id="searchAllByEnd" resultMap="BaseResultMap">
         select
         <include refid="Base_Column_List"/>

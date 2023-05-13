@@ -47,6 +47,13 @@
 <div class="layui-row layui-col-space15">
     <div id="temp">路径为：</div>
 </div>
+<div class="layui-row layui-col-space15">
+    <div id="nowtime">当前时间：</div>
+</div>
+<div class="layui-row layui-col-space15">
+    <div id="time">预估到达时间：</div>
+</div>
+
 
 
 <script src="../../static/echarts/echarts.js" charset="utf-8"></script>
@@ -70,6 +77,8 @@
         var Emap = echarts.init(document.getElementById('Emap'), 'walden');
         Emap.showLoading();
         const Element =document.getElementById("temp")
+        const time =document.getElementById("time")
+        const nowtime =document.getElementById("nowtime")
         $.ajax({
             url:"QSDeal",
             type:"post",
@@ -257,6 +266,24 @@
 
         })
 
+        $.ajax({
+            url: "gettime",
+            type: "POST",
+            dataType: "json",
+            contentType:"application/json",
+            data:JSON.stringify(myData) ,
+            success: function (data) {
+                if (data.code == 0) {
+                    //layer.msg("传递成功::" + data.msg);
+                   time.innerHTML += data.data[0];
+                   nowtime.innerHTML += data.data[1];
+
+                } else {
+                    layer.msg("传递失败::" + data.msg);
+                }
+
+            }
+        });
 
     });
 </script>
