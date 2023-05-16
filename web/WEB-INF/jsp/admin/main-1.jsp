@@ -178,17 +178,6 @@
                             saveAsImage: {}
                         }
                     },
-                    // visualMap: {
-                    //     //
-                    //     min: 800,
-                    //     max: 50000,
-                    //     text: ['High', 'Low'],
-                    //     realtime: false,
-                    //     calculable: true,
-                    //     inRange: {
-                    //         color: ['lightskyblue', 'yellow', 'orangered']
-                    //     }
-                    // },
                     series: [
                         {
                             name: '江苏路径图',

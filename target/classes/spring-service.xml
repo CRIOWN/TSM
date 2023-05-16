@@ -50,6 +50,7 @@
     <!--定义一个事务通知(txAdvice)，将它注入到匹配txPointCut切入点上的服务层接口中。-->
     <tx:advice id="txAdvice" transaction-manager="transactionManager">
         <tx:attributes>
+<!--            提交事务-->
             <tx:method name="add" propagation="REQUIRED"/>
             <tx:method name="delete" propagation="REQUIRED"/>
             <tx:method name="update" propagation="REQUIRED"/>
