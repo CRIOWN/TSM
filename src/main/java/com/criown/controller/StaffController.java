@@ -302,4 +302,99 @@ public Map<String,Object> Main1Data1(){
             return MapControl.getInstance().jsonSuccess(list1,count).getMap();
         }
     }
+
+    //数据展示
+    @RequestMapping("/showTsp")
+    @ResponseBody
+    public Map QSDeal(@RequestBody Map<String,Object> map) throws IOException {
+        System.out.println("rest");
+        System.out.println("QSdeal::"+map);
+        List<Integer> tspPath=TxTsp.getTspPath();
+//      Jedis jedis =new Jedis("localhost");
+//      System.out.println("redis 存储的字符串为: "+ jedis.get("runkey"));
+        return MapControl.getInstance().jsonSuccess(tspPath,1).getMap();
+    }
+
+    //==============订单处理========================
+    //跳转Good编辑
+    @RequestMapping("/gotoEditGood")
+    public String gotoEditGood(Integer id,Model model){
+        System.out.println("gotoEditGood::"+id);
+        model.addAttribute("id",id);
+        return "utils/editGood";
+    }
+
+    //Good编辑
+    @PostMapping("/EditGood")
+    @ResponseBody
+    public Map<String,Object> GoodEdit(@RequestBody Map<String,Object> map) throws IOException {
+        System.out.println("GoodEdit::"+map);
+        int id=Integer.parseInt(String.valueOf(map.get("id")));
+        int clientid=Integer.parseInt(String.valueOf(map.get("clientid")));
+        int start =Integer.parseInt(String.valueOf(map.get("start")));
+        int end =Integer.parseInt(String.valueOf(map.get("end")));
+        String detail=String.valueOf(map.get("detail"));
+        Date sendtime=new Date();
+        //Tsp 计算路径长
+        int n=0;
+        n=TxTsp.tsp(start,end);
+        //计算时长
+        int hour=n/(5000/24);
+        System.out.println(hour);
+        //计算
+        Date recetime= DateUtil.calculate(sendtime,hour);
+        goodService.updateById(id,clientid,start,end,sendtime,recetime,detail);
+        System.out.println("修改完毕");
+        return MapControl.getInstance().jsonSuccess().getMap();
+    }
+
+    //客户删除
+    @PostMapping("/DelGood")
+    @ResponseBody
+    public Map<String,Object> DelGood(@RequestBody List<String> ids){
+        System.out.println("DelGood::"+ids);
+        List<Integer> list=new ArrayList<>();
+        for(String s:ids){
+            list.add(Integer.parseInt(s));
+        }
+        System.out.println("list::"+list);
+        goodService.delByList(list);
+        System.out.println("删除完毕");
+        return MapControl.getInstance().jsonSuccess().getMap();
+    }
+
+    //跳转 GoodAdd
+    @RequestMapping("/gotoAddGood")
+    public String gotoAddGood(){
+        return "utils/addGood";
+    }
+
+    //Good增加
+    @PostMapping("/AddGood")
+    @ResponseBody
+    public Map<String,Object> AddGood(@RequestBody(required = false)  Map<String,Object> map) throws IOException {
+        System.out.println("AddGood::"+map);
+        //String id=String.valueOf(map.get("id"));
+        Integer clientid=Integer.valueOf(String.valueOf(map.get("clientid")));
+        Integer start=Integer.valueOf(String.valueOf(map.get("start")));
+        Integer end=Integer.valueOf(String.valueOf(map.get("end")));
+
+        String detail=String.valueOf(map.get("detail"));
+        Date sendtime=new Date();
+        //Tsp 计算路径长
+        int n=0;
+        n=TxTsp.tsp(start,end);
+        //计算时长
+        int hour=n/(5000/24);
+        System.out.println(hour);
+        //计算
+        Date recetime= DateUtil.calculate(sendtime,hour);
+
+        System.out.println("clientid="+clientid+"::start="+start+"::end="+end+"::detail="+detail+"::sendtime="+sendtime+"::recetime"+recetime);
+
+
+        goodService.addAll(clientid,start,end,sendtime,recetime,detail);
+        return MapControl.getInstance().jsonSuccess().getMap();
+    }
+
 }

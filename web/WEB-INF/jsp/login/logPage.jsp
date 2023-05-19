@@ -50,15 +50,15 @@
                 </div>
                 <div class="layui-form-item">
                     <label  for="username" class="layui-icon layui-icon-username"></label>
-                    <input type="text" name="username" lay-verify="required|account" placeholder="用户名或者邮箱" autocomplete="off" class="layui-input" value="admin">
+                    <input type="text" name="username" lay-verify="required|account" placeholder="请输入用户名" autocomplete="off" class="layui-input" value="">
                 </div>
                 <div class="layui-form-item">
                     <label class="layui-icon layui-icon-password" for="password"></label>
-                    <input type="password" name="password" lay-verify="required|password" placeholder="密码" autocomplete="off" class="layui-input" value="111111">
+                    <input type="password" name="password" lay-verify="required|password" placeholder="密码" autocomplete="off" class="layui-input" value="">
                     <span style="color: red;font-weight: bold"> ${errorpwd} </span>
                 </div>
                 <div class="layui-form-item">
-                    <input type="checkbox"  value="true"  title="记住密码">
+                    <input type="checkbox"  value="true" id="rememenber" title="记住密码">
                 </div>
                 <div class="layui-form-item">
                     <label class="layui-form-label">用户类型</label>
@@ -74,6 +74,9 @@
                 <div class="layui-form-item">
                     <button type="submit" class="layui-btn layui-btn layui-btn-normal layui-btn-fluid" lay-submit="" lay-filter="login">登 入</button>
                 </div>
+                <div class="layui-form-item">
+                <button type="button" id="register-btn" class="layui-btn layui-btn layui-btn-normal layui-btn-fluid" lay-submit="" lay-filter="reg">注册</button>
+                 </div>
             </div></form>
         </div>
     </div>
@@ -81,6 +84,7 @@
 
 <script src="../../static/lib/jquery-3.4.1/jquery-3.4.1.min.js" charset="utf-8"></script>
 <script src="../../static/lib/layui-v2.6.3/layui.js" charset="utf-8"></script>
+<script src="../../static/js/jquery.cookie.js" charset="utf-8"></script>
 <script src="../../static/lib/jq-module/jquery.particleground.min.js" charset="utf-8"></script>
 <script>
     layui.use(['form','jquery'], function () {
@@ -91,6 +95,40 @@
         // 登录过期的时候，跳出ifram框架
         if (top.location != self.location) top.location = self.location;
 
+        function setCookie(){
+            var username = $('input[name="username"]').val();
+            var password = $('input[name="password"]').val();
+            console.log(username+"::"+password)
+            var aa = $("input[type='checkbox']").is(":checked");//获取是否选中
+            if(aa==true){//如果选中-->记住密码登录
+                $.cookie("username",username.trim(),{ expires: 7 }); //7天
+                $.cookie("password",password.trim(),7);
+            }else{//如果没选中-->不记住密码登录
+                $.cookie("password", "");
+                $.cookie("username", "");
+                alert("没有记住密码")
+            }
+        }
+
+        function getCookie() { //获取cookie
+            var username = $.cookie("username"); //获取cookie中的用户名
+            var password = $.cookie("password"); //获取cookie中的登录密码
+            if (password) { //密码存在的话把“记住用户名和密码”复选框勾选住
+                $("input[name='rememenber']").prop("checked", true);
+            }
+            if (username) { //用户名存在的话把用户名填充到用户名文本框
+                $("input[name='username']").val(username);
+            } else {
+                $("input[name='username']").val("");
+            }
+            if (password) { //密码存在的话把密码填充到密码文本框
+                $("input[name='password']").val(password);
+            } else {
+                $("input[name='password']").val("");
+            }
+        }
+
+
         // 粒子线条背景
         $(document).ready(function(){
             $('.layui-container').particleground({
@@ -98,10 +136,10 @@
                 lineColor:'#7ec7fd'
             });
         });
-
+        getCookie()
         // 进行登录操作
         form.on('submit(login)', function (data) {
-
+            setCookie()
             data = data.field;
             if (data.username == '') {
                 layer.msg('用户名不能为空');
@@ -175,6 +213,12 @@
 
             }
             return false;
+        });
+
+        $('#register-btn').click(function () {
+            // 执行注册逻辑...
+            // 页面跳转
+            window.location.href = "${pageContext.request.contextPath}/client/gotologreg";
         });
     });
 </script>

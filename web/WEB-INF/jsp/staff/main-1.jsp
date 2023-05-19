@@ -111,228 +111,200 @@
 <%--<script src="//api.map.baidu.com/api?v=1.0&type=webgl&ak=pl2seBoP0MbDQuMUlogePygiCPAhKl5c"></script>--%>
 <script src="../../static/js/lay-config.js?v=1.0.4" charset="utf-8"></script>
 <script src="../../static/echarts/echarts.js" charset="utf-8"></script>
-
+<script src="../../static/js/cityMapper.js" charset="utf-8"></script>
 <script>
     layui.use(['layer','jquery'], function () {
         var $ = layui.jquery;
 
-        /**
-         *
-         * 地图
-         */
-            // 添加连线
-        var geoCoordMap = {
-                '南京市':[118.796877,32.060255],
-                '苏州市':[120.585315,31.298886],
-                '无锡市':[120.305456,31.570037],
-                '常州市':[119.981861,31.771397],
-                '南通市':[120.873801,32.014665],
-                '扬州市':[119.421003,32.393159],
-                '镇江市':[119.452753,32.204402],
-                '徐州市':[117.184811,34.261792],
-                '淮安市':[119.015285,33.610353],
-                '盐城市':[120.163561,33.347382]
-            };
-        var convertData = function(data) {
-            var res =[];
-            for (var i = 0; i < data.length; i++) {
-                var geoCoord = geoCoordMap[data[i].name];
-                if (geoCoord) {
-                    res.push({
-                        name: data[i].name,
-                        value: geoCoord.concat(data[i].value)
-                    });
-                }
-            }
-            console.log("convertData::"+res);
-            return res;
-        };
+        var pathnode=[];
+        var lineData=[];
+        const myData ={
+            "id":1,
+            "clientid":1
+        }
+
         //基础绘制
         var Emap = echarts.init(document.getElementById('Emap'), 'walden');
         Emap.showLoading();
-        //https://geo.datav.aliyun.com/areas_v3/bound/320000_full.json
-        $.get('https://geo.datav.aliyun.com/areas_v3/bound/320000_full.json', function (geoJson)
-        {
-            //console.log("test1");
-            echarts.registerMap('jiangsu', geoJson);
-            Emap.setOption(
-                (option={
-                    title: {
-                        text: '物流路径',
-                        subtext: '江苏省',
-                        //副标题跳转地
-                        // sublink:'http://zh.wikipedia.org/wiki/%E9%A6%99%E6%B8%AF%E8%A1%8C%E6%94%BF%E5%8D%80%E5%8A%83#cite_note-12'
-                    },
-                    tooltip: {
-                        trigger: 'item',
-                        formatter: '地名'
-                    },
-                    toolbox: {
-                        show: true,
-                        orient: 'vertical',
-                        left: 'right',
-                        top: 'center',
-                        feature: {
-                            dataView: { readOnly: false },
-                            restore: {},
-                            saveAsImage: {}
-                        }
-                    },
-                    // visualMap: {
-                    //     //
-                    //     min: 800,
-                    //     max: 50000,
-                    //     text: ['High', 'Low'],
-                    //     realtime: false,
-                    //     calculable: true,
-                    //     inRange: {
-                    //         color: ['lightskyblue', 'yellow', 'orangered']
-                    //     }
-                    // },
-                    series: [
-                        {
-                            name: '江苏路径图',
-                            type: 'map',
+        $.ajax({
+            url:"showTsp",
+            type:"post",
+            data:JSON.stringify(myData),
+            dataType:"json",
+            contentType:'application/json',
+            success:function (data){
+                pathnode.push(...data.data)
+                console.log(pathnode)
+                for(let i=0;i<pathnode.length-1;i++)
+                {
+                    let from= convertIdToCityName(pathnode[i])
+                    let to = convertIdToCityName(pathnode[i+1])
+                    let frompoint=convertIdToCityLocal(pathnode[i]);
+                    let topoint=convertIdToCityLocal(pathnode[i+1]);
+                    lineData.push({
+                        point:[from,to],
+                        coords: [frompoint,topoint]
+                    })
+                }
+
+                //基础绘制
+                var option;
+                $.get('https://geo.datav.aliyun.com/areas_v3/bound/320000_full.json', function (geoJson) {
+                    echarts.registerMap('jiangsu', geoJson);
+                    option = {
+                        title: {
+                            text: '物流路径',
+                            subtext: '江苏省',
+                        },
+                        tooltip: {
+                            trigger: 'item',
+                            formatter: '地名'
+                        },
+                        toolbox: {
+                            show: true,
+                            orient: 'vertical',
+                            left: 'right',
+                            top: 'center',
+                            feature: {
+                                dataView: {readOnly: false},
+                                restore: {},
+                                saveAsImage: {}
+                            }
+                        },
+                        geo: {
+                            show: false,
                             map: 'jiangsu',
-                            label: {
-                                show: true
-                            },
+                            type: 'map',
                             roam: true,
-                            data: [
-                                //赋值
-                                // { name: '中西区', value: 20057.34 },
-                            ],
-                            markPoint:{
-                                symbol:"circle",
-                                symbolSize: 10,
-                                label: {
+                            label: {
+                                normal: {
+                                    // 显示省份标签
                                     show: false,
-                                    formatter: '{b}'
+                                    textStyle: {
+                                        color: '#fff',
+                                        fontSize: 10
+                                    }
                                 },
-                                itemStyle: {
-                                    color: '#F00'
-                                },
-                                data: [
-                                    { name: '南京市', coord: [118.802422, 32.064652] },
-                                    { name: '无锡市', coord: [120.31191, 31.491169] },
-                                    { name: '徐州市', coord: [117.284124, 34.205768] },
-                                    { name: '常州市', coord: [119.973987, 31.810689] },
-                                    { name: '苏州市', coord: [120.585315, 31.298886] },
-                                    { name: '南通市', coord: [120.856394, 32.016212] },
-                                    { name: '连云港市', coord: [119.22295, 34.59669] },
-                                    { name: '淮安市', coord: [119.021265, 33.597506] },
-                                    { name: '盐城市', coord: [120.163562, 33.347383] },
-                                    { name: '扬州市', coord: [119.412966, 32.39421] },
-                                    { name: '镇江市', coord: [119.425836, 32.187849] },
-                                    { name: '泰州市', coord: [119.915176, 32.484882] },
-                                    { name: '宿迁市', coord: [118.275162, 33.963008] }
-                                ]
-                            },
-                            lines:{
-                                data:[[118.796877,32.060255],[120.585315,31.298886],[120.305456,31.570037],
-                                    [119.981861,31.771397]],
-                                lineStyle: {
-                                    color:"#0e00fe",
-                                    width: 4,
-                                    type:'solid'
+                                emphasis: {
+                                    // 对应的鼠标悬浮效果
+                                    show: true,
+                                    // 选中后的字体样式
+                                    textStyle: {
+                                        color: '#000',
+                                        fontSize: 14
+                                    }
                                 }
                             }
                         },
-                        {
-                            type: 'lines',
-                            coordinateSystem:'geo',
-                            polyline:true,
-                            data:[[118.796877,32.060255],[120.585315,31.298886],[120.305456,31.570037],
-                                [119.981861,31.771397]],
-                            lineStyle: {
-                                color:"#0e00fe",
-                                width: 0,
-                                type:'solid'
+                        series: [
+                            {
+                                name: '江苏路径图',
+                                type: 'map',
+                                map: 'jiangsu',
+                                label: {
+                                    show: true
+                                },
+                                roam: false,
+                                data: [
+                                ],
+                                markPoint: {
+                                    symbol: "circle",
+                                    symbolSize: 10,
+                                    label: {
+                                        show: false,
+                                        formatter: '{b}'
+                                    },
+                                    itemStyle: {
+                                        color: '#F00'
+                                    },
+                                    data: [
+                                        {name: '南京市', coord: [118.802422, 32.064652]},
+                                        {name: '无锡市', coord: [120.31191, 31.491169]},
+                                        {name: '徐州市', coord: [117.284124, 34.205768]},
+                                        {name: '常州市', coord: [119.973987, 31.810689]},
+                                        {name: '苏州市', coord: [120.585315, 31.298886]},
+                                        {name: '南通市', coord: [120.856394, 32.016212]},
+                                        {name:'连云港市',coord: [119.22295, 34.59669]},
+                                        {name: '淮安市', coord: [119.021265, 33.597506]},
+                                        {name: '盐城市', coord: [120.163562, 33.347383]},
+                                        {name: '扬州市', coord: [119.412966, 32.39421]},
+                                        {name: '镇江市', coord: [119.425836, 32.187849]},
+                                        {name: '泰州市', coord: [119.915176, 32.484882]},
+                                        {name: '宿迁市', coord: [118.275162, 33.963008]}
+                                    ]
+                                },
                             },
-                            effect: {
-                                constantSpeed: 20,
+                            {
+                                name: '',
+                                type: 'scatter',
+                                coordinateSystem: 'geo',
+                                color: ['#000'],
+                                tooltip: {
+                                    position: "right",
+                                    color: "#000",
+                                    formatter(d) {
+                                        console.log(d)
+                                        return `<div style="padding: 5px 10px;">【${d.data.name}】</div>`;
+                                    },
+                                },
+                                data: [
+                                    {name: '南京市', coord: [118.802422, 32.064652]},
+                                    {name: '无锡市', coord: [120.31191, 31.491169]},
+                                    {name: '徐州市', coord: [117.284124, 34.205768]},
+                                    {name: '常州市', coord: [119.973987, 31.810689]},
+                                    {name: '苏州市', coord: [120.585315, 31.298886]},
+                                    {name: '南通市', coord: [120.856394, 32.016212]},
+                                    {name: '连云港市', coord: [119.22295, 34.59669]},
+                                    {name: '淮安市', coord: [119.021265, 33.597506]},
+                                    {name: '盐城市', coord: [120.163562, 33.347383]},
+                                    {name: '扬州市', coord: [119.412966, 32.39421]},
+                                    {name: '镇江市', coord: [119.425836, 32.187849]},
+                                    {name: '泰州市', coord: [119.915176, 32.484882]},
+                                    {name: '宿迁市', coord: [118.275162, 33.963008]}
+                                ],
+                            },
+                            {
+                                type: 'lines',
+                                coordinateSystem: 'geo',
+                                effect: {
+                                    constantSpeed: 20,
+                                    show: true,
+                                    trailLength: 0.1,
+                                    symbolSize: 1.5
+                                },
+                                lineStyle: {
+                                    type: 'solid',
+                                    width: 3,
+                                    opacity: 1,
+                                    curveness: 0,
+                                    orient: 'horizontal',
+                                    color: "#f80e0e",
+                                },
+                                tooltip: {
+                                    position: "right",
+                                    color: "#000",
+                                    formatter(d) {
+                                        //console.log(d.data.point[0]);
+                                        // console.log(d.data.point[1]);
+                                        return '<div style="padding: 5px 10px;"> 【' + d.data.point[0] + '】< ---- >【' + d.data.point[1] + '】</div>';;
+                                    },
+                                },
                                 show: true,
-                                trailLength: 0.1,
-                                symbolSize: 1.5
-                            },
-                            zlevel: 1
-                        }
-                    ]
-                })
-            );
-            //  console.log("test2");
-            Emap.hideLoading();
-        });
+                                data: lineData,
+                                zlevel:3
 
-        var seriesdata = [
-            {
-                name: '江苏省主要城市',
-                type: 'lines',
-                zlevel: 1,
-                effect: {
-                    show: true,
-                    period: 6,
-                    trailLength: 0.7,
-                    color: '#fff',
-                    symbolSize: 3
-                },
-                lineStyle: {
-                    normal: {
-                        color: '#a6c84c',
-                        width: 0,
-                        curveness: 0.2
-                    }
-                },
-                data: convertData([
-                    {name: '南京市', value: 100},
-                    {name: '苏州市', value: 50},
-                    {name: '无锡市', value: 30},
-                    {name: '常州市', value: 20},
-                    {name: '南通市', value: 10},
-                    {name: '扬州市', value: 5},
-                    {name: '镇江市', value: 3},
-                    {name: '徐州市', value: 2},
-                    {name: '淮安市', value: 1},
-                    {name: '盐城市', value: 1}
-                ])
-            },
-            {
-                name: '江苏省主要城市',
-                type: 'effectScatter',
-                coordinateSystem: 'geo',
-                zlevel: 2,
-                rippleEffect: {
-                    brushType: 'stroke'
-                },
-                label: {
-                    normal: {
-                        show: true,
-                        position: 'right',
-                        formatter: '{b}'
-                    }
-                },
-                symbolSize: function (val) {
-                    return val[2] / 10;
-                },
-                itemStyle: {
-                    normal: {
-                        color: '#a6c84c'
-                    }
-                },
-                data: convertData([
-                    {name: '南京市', value: 100},
-                    {name: '苏州市', value: 50},
-                    {name: '无锡市', value: 30},
-                    {name: '常州市', value: 20},
-                    {name: '南通市', value: 10},
-                    {name: '扬州市', value: 5},
-                    {name: '镇江市', value: 3},
-                    {name: '徐州市', value: 2},
-                    {name: '淮安市', value: 1},
-                    {name: '盐城市', value: 1}
-                ])
+                            }
+                        ]
+                    };
+                    Emap.setOption(option);
+                    //console.log("do get"+option);
+                    Emap.hideLoading();
+                });
+
+
             }
-        ];
+
+        })
 
 
         /**

@@ -54,7 +54,7 @@ public class TxTsp{
                 double rij = Math
                         .sqrt(((x[i] - x[j]) * (x[i] - x[j]) + (y[i] - y[j])
                                 * (y[i] - y[j])) / 10.0);
-                // 四舍五入，取整(伪欧式距离)
+                // 四舍五入，取整(欧式距离)
                 //开平方 算直接距离
                 int tij = (int) Math.round(rij);//取整结果
                 if (tij < rij) {
@@ -188,7 +188,7 @@ public class TxTsp{
             for (int j = 0; j < n; j++) {
                 if (matrix[i][j] != Integer.MAX_VALUE) {
                     nodes[i].edges.add(new Edge(nodes[i], nodes[j], matrix[i][j]));
-                    //nodes[i].edges.add(new Edge(nodes[j], nodes[i], matrix[i][j]));
+                    //nodes[i].edges.add(new Edge(nodes[j], nodes[i], matrix[i][j]));//双向
                 }
             }
         }
@@ -254,7 +254,12 @@ public class TxTsp{
         List<Node> path = new ArrayList<>();
         path=Dijkstra.getPath(nodes[to]);//找对应线
         return path;
+    }
 
+    //tsp路线 for 主页
+    public static List<Integer> getTspPath() throws IOException {
+        TxTsp ts=initTsp();
+        return ts.tspPath;
     }
 
 

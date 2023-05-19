@@ -1,9 +1,6 @@
 package com.criown.controller;
 
-import com.criown.entity.Client;
-import com.criown.entity.Good;
-import com.criown.entity.Goodshow;
-import com.criown.entity.Staff;
+import com.criown.entity.*;
 import com.criown.service.*;
 import com.criown.utils.DateUtil;
 import com.criown.utils.MapControl;
@@ -536,6 +533,17 @@ public class AdminController {
         return MapControl.getInstance().jsonSuccess().getMap();
     }
 
+    //数据展示
+    @RequestMapping("/showTsp")
+    @ResponseBody
+    public Map QSDeal(@RequestBody Map<String,Object> map) throws IOException {
+        System.out.println("rest");
+        System.out.println("QSdeal::"+map);
+        List<Integer> tspPath=TxTsp.getTspPath();
+//      Jedis jedis =new Jedis("localhost");
+//      System.out.println("redis 存储的字符串为: "+ jedis.get("runkey"));
+        return MapControl.getInstance().jsonSuccess(tspPath,1).getMap();
+    }
 
 
 }

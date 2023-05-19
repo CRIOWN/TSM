@@ -7,6 +7,7 @@ public interface ClientLogService {
 
     //验证
     String selectUserpwdByUserid(Integer userid);
+
     Integer selectUseridByUsername(String username);
 
 
@@ -18,5 +19,5 @@ public interface ClientLogService {
     int deleteByUserid(@Param("userid") int userid);
 
     //添加
-    int insertAll(ClientLog clientLog);
+    int insertAll(@Param("username") String username, @Param("userpwd") String userpwd);
 }

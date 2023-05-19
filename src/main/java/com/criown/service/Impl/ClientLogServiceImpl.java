@@ -1,8 +1,8 @@
 package com.criown.service.Impl;
 
-import com.criown.entity.ClientLog;
 import com.criown.mapper.ClientLogMapper;
 import com.criown.service.ClientLogService;
+import org.apache.ibatis.annotations.Param;
 
 
 public class ClientLogServiceImpl implements ClientLogService {
@@ -28,8 +28,8 @@ public class ClientLogServiceImpl implements ClientLogService {
     }
 
     @Override
-    public int insertAll(ClientLog clientLog) {
-        return clientLogMapper.insertAll(clientLog);
+    public int insertAll(@Param("username") String username, @Param("userpwd") String userpwd) {
+        return clientLogMapper.insertAll(username, userpwd);
     }
 
     @Override

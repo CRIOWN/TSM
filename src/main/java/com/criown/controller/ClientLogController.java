@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -98,12 +99,21 @@ public class ClientLogController {
         else
             return MapControl.getInstance().error("密码错误,请重试").getMap();
     }
+
     //===============================
     //gotoUserChange
     @RequestMapping("/gotoUserChange")
     public String gotoUserChange(Model model){
         return "/utils/UserEdit";
     }
+
+    //gotoreg
+    @RequestMapping("/gotologreg")
+    public String gotoreg(Model model){
+        return "/login/register";
+    }
+
+
 
 
 }

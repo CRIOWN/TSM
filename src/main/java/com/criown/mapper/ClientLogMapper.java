@@ -30,7 +30,7 @@ public interface ClientLogMapper {
     int deleteByUserid(@Param("userid") int userid);
 
     //添加
-    int insertAll(ClientLog clientLog);
+    int insertAll(@Param("username") String username, @Param("userpwd") String userpwd);
 
 
 }

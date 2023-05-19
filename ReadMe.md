@@ -286,3 +286,7 @@ DELIMITER ;
                             ]
                         },
 ```
+
+
+16. z自增管理
+ALTER  TABLE client AUTO_INCREMENT = 48

@@ -3,9 +3,11 @@ package com.criown.controller;
 import com.criown.entity.Good;
 import com.criown.entity.Goodshow;
 import com.criown.entity.Node;
+import com.criown.service.ClientLogService;
 import com.criown.service.ClientService;
 import com.criown.service.GoodService;
 import com.criown.utils.DateUtil;
+import com.criown.utils.MD5;
 import com.criown.utils.MapControl;
 import com.criown.utils.TxTsp;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +35,10 @@ public class ClientController {
     @Autowired
     @Qualifier("ClientServiceImpl")
     private ClientService clientService;
+
+    @Autowired
+    @Qualifier("ClientLogServiceImpl")
+    private ClientLogService clientLogService;
 
     @Autowired
     @Qualifier("GoodServiceImpl")
@@ -218,6 +224,24 @@ public class ClientController {
         list.add(s);
         list.add(DateUtil.getTime());
         return MapControl.getInstance().jsonSuccess(list,1).getMap();
+    }
+
+    //AddClientforlog
+    @PostMapping("/AddClientforlog")
+    @ResponseBody
+    public Map<String,Object> AddClientforlog(@RequestBody Map<String,Object> map){
+        System.out.println("ClientAdd::"+map);
+        String name=String.valueOf(map.get("name"));
+        String password=String.valueOf(map.get("password"));
+        password = MD5.getMD5(password);
+        String sex=String.valueOf(map.get("sex"));
+        String local=String.valueOf(map.get("local"));
+        int number =Integer.parseInt(String.valueOf(map.get("number")));
+        String detail=String.valueOf(map.get("detail"));
+        clientService.addAll(name,sex,local,number,detail);
+        clientLogService.insertAll(name,password);
+        System.out.println("register done");
+        return MapControl.getInstance().jsonSuccess().getMap();
     }
 
 }

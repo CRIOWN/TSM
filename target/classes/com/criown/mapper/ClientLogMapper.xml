@@ -31,9 +31,8 @@
     </delete>
     <insert id="insertAll">
         insert into client_log
-            (userid, username, userpwd)
-        values (#{userid}, #{username}, #{userpwd})
-
+            (username, userpwd)
+        values (#{username}, #{userpwd})
     </insert>
     <select id="selectUseridByUsername" resultType="int">
         select userid
