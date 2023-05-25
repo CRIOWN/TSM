@@ -52,4 +52,16 @@ public class Redisutils {
          jedis.set("redisFunction","1");
          else  jedis.set("redisFunction","0");
      }
+
+     public int clientNum(int Client){
+          if (jedis.exists("clientNum"))
+          {
+              int now = Integer.parseInt(jedis.get("clientNum"));
+              return now-Client;
+          }
+          else {
+              jedis.set("clientNum", String.valueOf(Client));
+              return 0;
+          }
+     }
 }

@@ -10,7 +10,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>后台管理-登陆</title>
+    <title>后台管理-登录</title>
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta http-equiv="Access-Control-Allow-Origin" content="*">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
@@ -72,10 +72,10 @@
                     </div>
                 </div>
                 <div class="layui-form-item">
-                    <button type="submit" class="layui-btn layui-btn layui-btn-normal layui-btn-fluid" lay-submit="" lay-filter="login">登 入</button>
+                    <button type="submit" class="layui-btn layui-btn layui-btn-normal layui-btn-fluid" lay-submit="" lay-filter="login">登 录</button>
                 </div>
                 <div class="layui-form-item">
-                <button type="button" id="register-btn" class="layui-btn layui-btn layui-btn-normal layui-btn-fluid" lay-submit="" lay-filter="reg">注册</button>
+                <button type="button" id="register-btn" class="layui-btn layui-btn layui-btn-normal layui-btn-fluid" lay-submit="" lay-filter="reg">注 册</button>
                  </div>
             </div></form>
         </div>

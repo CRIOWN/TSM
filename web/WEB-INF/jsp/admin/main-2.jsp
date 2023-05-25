@@ -44,20 +44,6 @@
     <div class="layui-row layui-col-space15">
 
         <div class="layui-col-xs12 layui-col-md4">
-            <div class="layui-card top-panel">
-                <div class="layui-card-header">员工数量</div>
-                <div class="layui-card-body">
-                    <div class="layui-row layui-col-space5">
-                        <div class="layui-col-xs9 layui-col-md9 top-panel-number">
-                            ${StaffNum}
-                        </div>
-
-                    </div>
-                </div>
-            </div>
-
-        </div>
-        <div class="layui-col-xs12 layui-col-md4">
 
             <div class="layui-card top-panel">
                 <div class="layui-card-header">客户数量</div>
@@ -74,17 +60,29 @@
         </div>
         <div class="layui-col-xs12 layui-col-md4">
             <div class="layui-card top-panel">
-                <div class="layui-card-header">客户变化</div>
+                <div class="layui-card-header">货物数量</div>
                 <div class="layui-card-body">
                     <div class="layui-row layui-col-space5">
                         <div class="layui-col-xs9 layui-col-md9 top-panel-number">
-                            ${newgay}
+                            ${GoodNum}
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+        <div class="layui-col-xs12 layui-col-md4">
+            <div class="layui-card top-panel">
+                <div class="layui-card-header">未发货数量</div>
+                <div class="layui-card-body">
+                    <div class="layui-row layui-col-space5">
+                        <div class="layui-col-xs9 layui-col-md9 top-panel-number">
+                            ${noDone}
+                        </div>
 
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div class="layui-row layui-col-space15">
@@ -117,40 +115,45 @@
         var $ = layui.jquery;
         /**
          * 地图
-         * 热力图
          */
-        var nums=[];
-        var Mydata=[];
+        var pathnode=[];
+        var lineData=[];
         const myData ={
             "id":1,
             "clientid":1
         }
+
         //基础绘制
         var Emap = echarts.init(document.getElementById('Emap'), 'walden');
         Emap.showLoading();
         $.ajax({
-            url:"Main1Data3",
+            url:"showTsp",
             type:"post",
             data:JSON.stringify(myData),
             dataType:"json",
             contentType:'application/json',
             success:function (data){
-                nums.push(...data.data)
-                for(let i=0;i<13;i++)
+                pathnode.push(...data.data)
+                console.log(pathnode)
+                for(let i=0;i<pathnode.length-1;i++)
                 {
-                    Mydata.push({
-                        name:convertIdToCityName(i),
-                        value:nums[i]
+                    let from= convertIdToCityName(pathnode[i])
+                    let to = convertIdToCityName(pathnode[i+1])
+                    let frompoint=convertIdToCityLocal(pathnode[i]);
+                    let topoint=convertIdToCityLocal(pathnode[i+1]);
+                    lineData.push({
+                        point:[from,to],
+                        coords: [frompoint,topoint]
                     })
                 }
-                console.log(Mydata)
+
                 //基础绘制
                 var option;
                 $.get('https://geo.datav.aliyun.com/areas_v3/bound/320000_full.json', function (geoJson) {
                     echarts.registerMap('jiangsu', geoJson);
                     option = {
                         title: {
-                            text: '人员分布图',
+                            text: '物流路径',
                             subtext: '江苏省',
                         },
                         tooltip: {
@@ -168,26 +171,42 @@
                                 saveAsImage: {}
                             }
                         },
-                        visualMap: {
-                            min: 0,
-                            max: 40,
-                            text: ['High', 'Low'],
-                            realtime: false,
-                            calculable: true,
-                            inRange: {
-                                color: ['lightskyblue', 'yellow', 'orangered']
+                        geo: {
+                            show: false,
+                            map: 'jiangsu',
+                            type: 'map',
+                            roam: true,
+                            label: {
+                                normal: {
+                                    // 显示省份标签
+                                    show: false,
+                                    textStyle: {
+                                        color: '#fff',
+                                        fontSize: 10
+                                    }
+                                },
+                                emphasis: {
+                                    // 对应的鼠标悬浮效果
+                                    show: true,
+                                    // 选中后的字体样式
+                                    textStyle: {
+                                        color: '#000',
+                                        fontSize: 14
+                                    }
+                                }
                             }
                         },
                         series: [
                             {
-                                name: '江苏热力图',
+                                name: '江苏路径图',
                                 type: 'map',
                                 map: 'jiangsu',
                                 label: {
                                     show: true
                                 },
                                 roam: false,
-                                data:Mydata,
+                                data: [
+                                ],
                                 markPoint: {
                                     symbol: "circle",
                                     symbolSize: 10,
@@ -205,7 +224,7 @@
                                         {name: '常州市', coord: [119.973987, 31.810689]},
                                         {name: '苏州市', coord: [120.585315, 31.298886]},
                                         {name: '南通市', coord: [120.856394, 32.016212]},
-                                        {name: '连云港市' ,coord: [119.22295, 34.59669]},
+                                        {name:'连云港市',coord: [119.22295, 34.59669]},
                                         {name: '淮安市', coord: [119.021265, 33.597506]},
                                         {name: '盐城市', coord: [120.163562, 33.347383]},
                                         {name: '扬州市', coord: [119.412966, 32.39421]},
@@ -214,8 +233,67 @@
                                         {name: '宿迁市', coord: [118.275162, 33.963008]}
                                     ]
                                 },
-                            }
+                            },
+                            {
+                                name: '',
+                                type: 'scatter',
+                                coordinateSystem: 'geo',
+                                color: ['#000'],
+                                tooltip: {
+                                    position: "right",
+                                    color: "#000",
+                                    formatter(d) {
+                                        console.log(d)
+                                        return `<div style="padding: 5px 10px;">【${d.data.name}】</div>`;
+                                    },
+                                },
+                                data: [
+                                    {name: '南京市', coord: [118.802422, 32.064652]},
+                                    {name: '无锡市', coord: [120.31191, 31.491169]},
+                                    {name: '徐州市', coord: [117.284124, 34.205768]},
+                                    {name: '常州市', coord: [119.973987, 31.810689]},
+                                    {name: '苏州市', coord: [120.585315, 31.298886]},
+                                    {name: '南通市', coord: [120.856394, 32.016212]},
+                                    {name: '连云港市', coord: [119.22295, 34.59669]},
+                                    {name: '淮安市', coord: [119.021265, 33.597506]},
+                                    {name: '盐城市', coord: [120.163562, 33.347383]},
+                                    {name: '扬州市', coord: [119.412966, 32.39421]},
+                                    {name: '镇江市', coord: [119.425836, 32.187849]},
+                                    {name: '泰州市', coord: [119.915176, 32.484882]},
+                                    {name: '宿迁市', coord: [118.275162, 33.963008]}
+                                ],
+                            },
+                            {
+                                type: 'lines',
+                                coordinateSystem: 'geo',
+                                effect: {
+                                    constantSpeed: 20,
+                                    show: true,
+                                    trailLength: 0.1,
+                                    symbolSize: 1.5
+                                },
+                                lineStyle: {
+                                    type: 'solid',
+                                    width: 3,
+                                    opacity: 1,
+                                    curveness: 0,
+                                    orient: 'horizontal',
+                                    color: "#f80e0e",
+                                },
+                                tooltip: {
+                                    position: "right",
+                                    color: "#000",
+                                    formatter(d) {
+                                        //console.log(d.data.point[0]);
+                                        // console.log(d.data.point[1]);
+                                        return '<div style="padding: 5px 10px;"> 【' + d.data.point[0] + '】< ---- >【' + d.data.point[1] + '】</div>';;
+                                    },
+                                },
+                                show: true,
+                                data: lineData,
+                                zlevel:3
 
+                            }
                         ]
                     };
                     Emap.setOption(option);
@@ -231,61 +309,42 @@
 
         /**
          *
-         * 人数占比
+         * 收货
          */
         var EPerson = echarts.init(document.getElementById('EPerson'), 'walden');
         EPerson.showLoading();
         $.ajax({
             type:"post",
             async:true,//异步请求 可进行其他操作
-            url:"Main1Data1",
+            url:"Main2Data2",
             data:{},
             dataType:"json",
             success: function (result)
             {
-                //读map
-               // console.log("M1::"+result.data['admin']);
-                let admin=result.data['admin'];
-                let staff=result.data['staff'];
-                let client=result.data['client'];
-
-                EPerson.setOption( {
+                console.log("==========")
+                // let aresult =jQuery.parseJSON(result);
+                console.log("M2::"+result); console.log("==========")
+                EPerson.setOption({
                     title: {
-                        text: '人数分布',
-                        left: 'center'
+                        text: '各地收货数量'
                     },
-                    tooltip: {
-                        trigger: 'item',
-                        formatter: '{a} <br/>{b} : {c} ({d}%)'
-                    },
+                    tooltip: {},
                     legend: {
-                        orient: 'vertical',
-                        left: 'left',
-                        data: ['管理员', '员工', '客户']
+                        data:['货物数量']
                     },
-                    series: [
-                        {
-                            name: '人数',
-                            type: 'pie',
-                            radius: '55%',
-                            center: ['50%', '60%'],
-                            roseType: 'radius',
-                            data:[
-                                {value: admin,name:"管理员"},
-                                {value:staff,name:"员工"},
-                                {value:client,name:"客户"}
-                            ],
-                            emphasis: {
-                                itemStyle: {
-                                    shadowBlur: 10,
-                                    shadowOffsetX: 0,
-                                    shadowColor: 'rgba(100, 0, 0, 0.5)'
-                                }
-                            }
-                        }
-                    ]
+                    xAxis: {
+                        data: ['南京市','苏州市','无锡市','常州市','南通市','扬州市','镇江市','徐州市','淮安市','盐城市','连云港','泰州市','宿迁市']
+                    },
+                    yAxis: {},
+                    series: [{
+                        name: '货物数量',
+                        type: 'bar',
+                        data:result.data
+                        // 动态更新
+                    }]
                 });
                 EPerson.hideLoading();
+
             }
         })
 
@@ -293,36 +352,35 @@
 
         /**
          * 柱状图
-         * 件数
+         * 发货
          */
         var EGood = echarts.init(document.getElementById('EGood'), 'walden');
         EGood.showLoading();
         $.ajax({
             type:"post",
             async:true,//异步请求 可进行其他操作
-            url:"Main1Data2",
+            url:"Main2Data1",
             data:{},
             dataType:"json",
             success: function (result)
             {
                 console.log("==========")
                // let aresult =jQuery.parseJSON(result);
-                console.log("M2::"+result.data);
-                console.log("==========")
+                console.log("M2::"+result); console.log("==========")
                 EGood.setOption({
                     title: {
-                        text: '各地客户数量'
+                        text: '各地发货数量'
                     },
                     tooltip: {},
                     legend: {
-                        data:['人数']
+                        data:['货物数量']
                     },
                     xAxis: {
                         data: ['南京市','苏州市','无锡市','常州市','南通市','扬州市','镇江市','徐州市','淮安市','盐城市','连云港','泰州市','宿迁市']
                     },
                     yAxis: {},
                     series: [{
-                        name: '人数',
+                        name: '货物数量',
                         type: 'bar',
                         data:result.data
                         // 动态更新

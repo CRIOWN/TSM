@@ -228,18 +228,18 @@ public class AdminController {
     }
 
 
-    //跳转首页
+    //跳转 人员汇总
     @RequestMapping("/gotoMain1")
     public String gotoMain1(Model model){
         List list2=staffService.selectAll();
         List list3=clientService.selectAll();
-        List list4=goodService.selectAll();
+        Redisutils redisutils =new Redisutils();
         Integer StaffNum =list2.size();
         Integer ClientNum=list3.size();
-        Integer GoodNum = list4.size();
+        Integer Num = redisutils.clientNum(ClientNum);
         model.addAttribute("StaffNum",StaffNum);
         model.addAttribute("ClientNum",ClientNum);
-        model.addAttribute("GoodNum",GoodNum);
+        model.addAttribute("newgay",Num);
         return "admin/main-1";
     }
 
@@ -257,7 +257,6 @@ public class AdminController {
         model.addAttribute("StaffNum",StaffNum);
         model.addAttribute("ClientNum",ClientNum);
         model.addAttribute("GoodNum",GoodNum);
-
         return "admin/first";
     }
 
@@ -270,7 +269,30 @@ public class AdminController {
         return MapControl.getInstance().jsonSuccess(list,1).getMap();
     }
 
+    //主页数据-热力图
+    @PostMapping("/Main1Data3")
+    @ResponseBody
+    public Map<String,Object> Main1Data3(){
+        System.out.println("Main1Data2::人员");
+        List<String> cities = Arrays.asList(
+                "南京市", "苏州市", "无锡市", "常州市", "南通市", "扬州市",
+                "镇江市", "徐州市", "淮安市", "盐城市", "连云港", "泰州市", "宿迁市"
+        );
+        List<Client> list = clientService.selectAll();
 
+        Integer[] nums = new Integer[13];
+        for (int i=0;i<13;i++) nums[i] = 0;
+        for (Client client : list)
+        {
+            //'南京市','苏州市','无锡市','常州市','南通市','扬州市','镇江市','徐州市','淮安市','盐城市','连云港','泰州市','宿迁市'
+            String s = client.getLocal();
+            int index = cities.indexOf(s);
+            nums[index]++;
+        }
+        List<Integer> res = Arrays.asList(nums);
+        System.out.println(res);
+        return MapControl.getInstance().jsonSuccess(res,1).getMap();
+    }
 
     //主页数据图-人员占比
     @PostMapping("/Main1Data1")
@@ -287,11 +309,37 @@ public class AdminController {
         return MapControl.getInstance().jsonSuccess(map).getMap();
     }
 
-    //主页数据图-订单问题
+    //主页数据图-人员地址
     @PostMapping("/Main1Data2")
     @ResponseBody
     public Map<String,Object> Main1Data2(){
-        System.out.println("Main1Data2::订单");
+        System.out.println("Main1Data2::人员");
+        List<String> cities = Arrays.asList(
+                "南京市", "苏州市", "无锡市", "常州市", "南通市", "扬州市",
+                "镇江市", "徐州市", "淮安市", "盐城市", "连云港", "泰州市", "宿迁市"
+        );
+        List<Client> list = clientService.selectAll();
+
+        Integer[] nums = new Integer[13];
+        for (int i=0;i<13;i++) nums[i] = 0;
+        for (Client client : list)
+        {
+            //'南京市'7,'苏州市'3,'无锡市'5,'常州市'5,'南通市'3,'扬州市'2,'镇江市'0,'徐州市'6，'淮安市,2,'盐城市'4,'连云港'5,'泰州市'2,'宿迁市'2
+            String s = client.getLocal();
+            int index = cities.indexOf(s);
+            nums[index]++;
+        }
+        List<Integer> res = Arrays.asList(nums);
+        System.out.println(res);
+        return MapControl.getInstance().jsonSuccess(res,1).getMap();
+    }
+
+
+    //主页数据图-订单问题
+    @PostMapping("/Main2Data1")
+    @ResponseBody
+    public Map<String,Object> Main2Data1(){
+        System.out.println("Main2Data1::发货");
         List<Good> list[]=new ArrayList[13];
         List<Integer> integerList=new ArrayList<>();
 
@@ -302,7 +350,45 @@ public class AdminController {
         return MapControl.getInstance().jsonSuccess(integerList,1).getMap();
     }
 
-//==========Good================
+    @PostMapping("/Main2Data2")
+    @ResponseBody
+    public Map<String,Object> Main2Data2(){
+        System.out.println("Main2Data2::收货");
+        List<Good> list[]=new ArrayList[13];
+        List<Integer> integerList=new ArrayList<>();
+
+        for(int i=0;i<13;i++){
+            list[i]=goodService.searchAllByEnd(i);
+            integerList.add(list[i].size());
+        }
+        return MapControl.getInstance().jsonSuccess(integerList,1).getMap();
+    }
+
+
+    //跳转 订单汇总
+    @RequestMapping("/gotoMain2")
+    public String gotoMain2(Model model){
+    // 货物数量 客户数量 未确认数量
+        List<Good> list=goodService.selectAll();
+        List list3=clientService.selectAll();
+        Integer GoodNum = list.size();
+        Integer ClientNum = list3.size();
+        Integer noDone = 0;
+        List<Goodshow> goodshowList=Goodshow.convertGoods(list);
+        for (Goodshow good:goodshowList)
+        {
+            if(good.getRecetimeS().equals("null"))
+                noDone++;
+        }
+
+        model.addAttribute("noDone",noDone);
+        model.addAttribute("ClientNum",ClientNum);
+        model.addAttribute("GoodNum",GoodNum);
+        return "admin/main-2";
+    }
+
+
+    //==========Good================
     //Good.json
     @PostMapping("/listForGood")
     @ResponseBody

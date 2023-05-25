@@ -108,4 +108,32 @@ public class utilstest {
         for(String s: stringList)
             list.add(Integer.parseInt(s));
     }
+
+    @Test
+    public void Listandnums()
+    {
+        Integer[] nums = new Integer[13];
+        for (int i=0;i<13;i++) nums[i] = 1;
+        System.out.println(nums);
+        nums[2]++;
+        System.out.println(nums);
+        List<Integer> list = Arrays.asList(nums);
+        System.out.println(list);
+    }
+
+    @Test
+    public void sd()
+    {
+        Integer[] nums = new Integer[13];
+        for (int i=0;i<13;i++) nums[i] = 0;
+        List<String> cities = Arrays.asList(
+                "南京市", "苏州市", "无锡市", "常州市", "南通市", "扬州市",
+                "镇江市", "徐州市", "淮安市", "盐城市", "连云港", "泰州市", "宿迁市"
+        );
+        String s ="苏州市";
+        int index = cities.indexOf(s);
+        nums[index]++;
+        System.out.println(index);
+        System.out.println(nums[index]);
+    }
 }

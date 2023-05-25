@@ -16,24 +16,30 @@
       "target": "_self",
       "child": [
         {
-          "title": "物流主页",
+          "title": "数据统计",
           "href": "",
           "icon": "fa fa-home",
           "target": "_self",
           "child": [
             {
-              "title": "数据汇总",
+              "title": "人员汇总",
               "href": "gotoMain1",
               "icon": "fa fa-tachometer",
               "target": "_self"
             },
             {
-              "title": "物流操作",
-              "href": "gotoQSDeal",
+              "title": "订单汇总",
+              "href": "gotoMain2",
               "icon": "fa fa-tachometer",
               "target": "_self"
             }
           ]
+        },
+        {
+          "title": "物流操作",
+          "href": "gotoQSDeal",
+          "icon": "fa fa-tachometer",
+          "target": "_self"
         },
         {
           "title": "货物管理",
